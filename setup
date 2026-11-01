@@ -1,0 +1,4 @@
+ls ~/tt-metal | head -5
+source ~/tt-metal/python_env/bin/activate
+python3 -c "import ttnn; print('ttnn OK')"
+python3 -c "import ttml; print('ttml OK')"
