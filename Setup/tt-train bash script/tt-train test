@@ -1,3 +1,10 @@
+Step 1: prove training runs on the card before we touch the SNN. This runs Tenstorrent's stock NanoGPT trainer for 50 steps:
+
 ls ~/tt-metal/tt-train/sources/examples/nano_gpt
 ls ~/tt-metal/build/tt-train/sources/examples
 find ~/tt-metal/tt-train -name "*.py" -path "*example*" | head -15
+
+
+Step 2: run the smallest example. Linear regression is the quickest way to prove a full training loop (forward, backward, optimizer step) runs on your N150:
+
+cd ~/tt-metal && ./build/tt-train/sources/examples/linear_regression/linear_regression
