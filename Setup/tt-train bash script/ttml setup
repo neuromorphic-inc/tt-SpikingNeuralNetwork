@@ -35,3 +35,30 @@ cd ~/tt-metal/tt-train/sources/ttml/ttml; grep -n "Function" autograd/__init__.p
 Step 7: read the two examples so we see exactly what forward receives and returns (read-only):
 
 cd ~/tt-metal/tt-train/sources/ttml/ttml; sed -n 11,37p autograd/__init__.py; sed -n 13,45p models/llama/autograd_ops.py
+
+
+Step 8: test a spike function on the card. Spike uses ttnn.gt(u, 0) forward and a SuperSpike-style surrogate, 1/(1+5|u|)², backward. You can swap in your reference's surrogate later. The script checks both against numpy:
+
+TT_LOGGER_LEVEL=FATAL python3 - <<'EOF'
+import numpy as np, ttnn, ttml
+SEEN = {}
+
+class Spike(ttml.autograd.Function):
+    @staticmethod
+    def forward(ctx, u, k):
+        ctx.u, ctx.k = u.get_value(), k
+        return ttml.autograd.create_tensor(ttnn.gt(ctx.u, 0.0), requires_grad=True)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        d = ttnn.reciprocal(ttnn.square(ttnn.add(ttnn.multiply(ttnn.abs(ctx.u), ctx.k), 1.0)))
+        SEEN["g"] = ttnn.multiply(grad_output, d)
+        return ttml.autograd.create_tensor(SEEN["g"], requires_grad=False)
+
+host = lambda t: ttnn.to_torch(t).float().numpy()
+x = np.linspace(-2, 2, 1024, dtype=np.float32).reshape(1, 1, 32, 32)
+y = Spike.apply(ttml.autograd.Tensor.from_numpy(x), 5.0)
+y.backward(False)
+print("spikes match:", np.array_equal(host(y.get_value()), (x > 0).astype(np.float32)))
+print("grad max err:", float(np.abs(host(SEEN["g"]) - 1 / (1 + 5 * np.abs(x)) ** 2).max()) if "g" in SEEN else "backward never ran")
+EOF
