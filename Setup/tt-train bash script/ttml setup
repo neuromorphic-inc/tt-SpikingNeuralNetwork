@@ -4,6 +4,7 @@ source python_env/bin/activate
 python3 -c "import ttnn; print('ttnn OK')"
 python3 -c "import ttml; print('ttml OK')"
 
+
 Step 1: prove training runs on the card before we touch the SNN. This runs Tenstorrent's stock NanoGPT trainer for 50 steps:
 
 ls ~/tt-metal/tt-train/sources/examples/nano_gpt
@@ -19,3 +20,8 @@ cd ~/tt-metal && ./build/tt-train/sources/examples/linear_regression/linear_regr
 Step 4: see how the Python example is run and which ttml pieces it uses. This is read-only and doesn't touch the device:
 
 cd ~/tt-metal/tt-train/sources/examples/nano_gpt; grep -n "add_argument\|__main__" nanogpt_primitives_example.py | cut -c1-110 | head -15; grep -o "ttml\.[A-Za-z_.]*" nanogpt_primitives_example.py | sort -u | head -30
+
+
+Step 5: list what ttml exposes:
+
+python -c "import ttml as t; f=lambda m:' '.join(n for n in dir(m) if not n.startswith('_')); print('ops:',f(t.ops)); print('unary:',f(t.ops.unary)); print('binary:',f(t.ops.binary)); print('autograd:',f(t.autograd))" 2>/dev/null
