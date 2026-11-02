@@ -62,3 +62,8 @@ y.backward(False)
 print("spikes match:", np.array_equal(host(y.get_value()), (x > 0).astype(np.float32)))
 print("grad max err:", float(np.abs(host(SEEN["g"]) - 1 / (1 + 5 * np.abs(x)) ** 2).max()) if "g" in SEEN else "backward never ran")
 EOF
+
+
+Step 9: see how the example runs its training loop (read-only):
+
+cd ~/tt-metal/tt-train/sources/examples/nano_gpt; grep -n -B8 -A10 "\.backward(" nanogpt_primitives_example.py | cut -c1-110 | head -45; grep -n "optimizers\.\|requires_grad\|reset_graph\|zero_grad" nanogpt_primitives_example.py | cut -c1-110 | head -15
