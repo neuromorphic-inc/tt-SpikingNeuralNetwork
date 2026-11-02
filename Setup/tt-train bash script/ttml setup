@@ -25,3 +25,8 @@ cd ~/tt-metal/tt-train/sources/examples/nano_gpt; grep -n "add_argument\|__main_
 Step 5: list what ttml exposes:
 
 python -c "import ttml as t; f=lambda m:' '.join(n for n in dir(m) if not n.startswith('_')); print('ops:',f(t.ops)); print('unary:',f(t.ops.unary)); print('binary:',f(t.ops.binary)); print('autograd:',f(t.autograd))" 2>/dev/null
+
+
+Step 6: see how those custom ops are written (read-only):
+
+cd ~/tt-metal/tt-train/sources/ttml/ttml; grep -n "Function" autograd/__init__.py | cut -c1-110 | head -12; grep -n "class \|def forward\|def backward\|ctx\." models/llama/autograd_ops.py | cut -c1-110 | head -30
