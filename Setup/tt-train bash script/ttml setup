@@ -3,3 +3,19 @@ ls build/tt-train | head -3
 source python_env/bin/activate
 python3 -c "import ttnn; print('ttnn OK')"
 python3 -c "import ttml; print('ttml OK')"
+
+Step 1: prove training runs on the card before we touch the SNN. This runs Tenstorrent's stock NanoGPT trainer for 50 steps:
+
+ls ~/tt-metal/tt-train/sources/examples/nano_gpt
+ls ~/tt-metal/build/tt-train/sources/examples
+find ~/tt-metal/tt-train -name "*.py" -path "*example*" | head -15
+
+
+Step 2: run the smallest example. Linear regression is the quickest way to prove a full training loop (forward, backward, optimizer step) runs on your N150:
+
+cd ~/tt-metal && ./build/tt-train/sources/examples/linear_regression/linear_regression
+
+
+Step 4: see how the Python example is run and which ttml pieces it uses. This is read-only and doesn't touch the device:
+
+cd ~/tt-metal/tt-train/sources/examples/nano_gpt; grep -n "add_argument\|__main__" nanogpt_primitives_example.py | cut -c1-110 | head -15; grep -o "ttml\.[A-Za-z_.]*" nanogpt_primitives_example.py | sort -u | head -30
