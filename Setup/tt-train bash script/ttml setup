@@ -30,3 +30,8 @@ python -c "import ttml as t; f=lambda m:' '.join(n for n in dir(m) if not n.star
 Step 6: see how those custom ops are written (read-only):
 
 cd ~/tt-metal/tt-train/sources/ttml/ttml; grep -n "Function" autograd/__init__.py | cut -c1-110 | head -12; grep -n "class \|def forward\|def backward\|ctx\." models/llama/autograd_ops.py | cut -c1-110 | head -30
+
+
+Step 7: read the two examples so we see exactly what forward receives and returns (read-only):
+
+cd ~/tt-metal/tt-train/sources/ttml/ttml; sed -n 11,37p autograd/__init__.py; sed -n 13,45p models/llama/autograd_ops.py
