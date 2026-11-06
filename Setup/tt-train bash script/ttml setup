@@ -67,3 +67,8 @@ EOF
 Step 9: see how the example runs its training loop (read-only):
 
 cd ~/tt-metal/tt-train/sources/examples/nano_gpt; grep -n -B8 -A10 "\.backward(" nanogpt_primitives_example.py | cut -c1-110 | head -45; grep -n "optimizers\.\|requires_grad\|reset_graph\|zero_grad" nanogpt_primitives_example.py | cut -c1-110 | head -15
+
+
+Step 10: shows how the example defines modules and builds the optimizer
+
+cd ~/tt-metal/tt-train/sources/examples/nano_gpt; TT_LOGGER_LEVEL=FATAL python3 -c "import ttml; f=lambda m:' '.join(n for n in dir(m) if not n.startswith('_')); print('modules:',f(ttml.modules)); print('optimizers:',f(ttml.optimizers))"; grep -n "class \|ModuleBase\|Parameter\|LinearLayer\|AdamW\|SGD" nanogpt_primitives_example.py | cut -c1-110 | head -25
