@@ -72,3 +72,8 @@ cd ~/tt-metal/tt-train/sources/examples/nano_gpt; grep -n -B8 -A10 "\.backward("
 Step 10: shows how the example defines modules and builds the optimizer
 
 cd ~/tt-metal/tt-train/sources/examples/nano_gpt; TT_LOGGER_LEVEL=FATAL python3 -c "import ttml; f=lambda m:' '.join(n for n in dir(m) if not n.startswith('_')); print('modules:',f(ttml.modules)); print('optimizers:',f(ttml.optimizers))"; grep -n "class \|ModuleBase\|Parameter\|LinearLayer\|AdamW\|SGD" nanogpt_primitives_example.py | cut -c1-110 | head -25
+
+
+Step 11: read how a layer registers its weights and how the optimizer is built (read-only):
+
+cd ~/tt-metal/tt-train/sources/examples/nano_gpt; sed -n 163,192p nanogpt_primitives_example.py | grep -v '^\s*$'; grep -n "AdamW\|SGD\|create_optimizer\|\.parameters()" nanogpt_primitives_example.py | tail -6 | cut -c1-110
